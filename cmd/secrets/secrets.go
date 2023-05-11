@@ -1,0 +1,21 @@
+package secrets
+
+import (
+	listCmd "github.com/katiem0/gh-environments/cmd/secrets/list"
+	"github.com/spf13/cobra"
+)
+
+func NewCmdSecrets() *cobra.Command {
+
+	cmd := &cobra.Command{
+		Use:   "secrets <command> [flags]",
+		Args:  cobra.MinimumNArgs(1),
+		Short: "List and Create Environment secrets.",
+		Long:  "List and Create Environment secrets for an organization and/or repositories.",
+	}
+	cmd.Flags().Bool("help", false, "Show help for command")
+	cmd.AddCommand(listCmd.NewCmdList())
+	//cmd.AddCommand(createCmd.NewCmdCreate())
+
+	return cmd
+}
