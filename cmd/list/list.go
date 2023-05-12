@@ -227,7 +227,6 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 						Branches = strings.Join(branchList, ";")
 					} else if env.DeploymentPolicy.ProtectedBranches {
 						BranchPolicyType = "protected"
-						Branches = "test"
 					}
 				}
 			}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/cli/go-gh"
@@ -117,6 +118,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 	csvWriter := csv.NewWriter(reportWriter)
 
 	err := csvWriter.Write([]string{
+		"RepositoryID",
 		"RepositoryName",
 		"EnvironmentName",
 		"VariableName",
@@ -186,6 +188,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 
 			for _, evar := range envVars.Variables {
 				err = csvWriter.Write([]string{
+					strconv.Itoa(singleRepo.DatabaseId),
 					singleRepo.Name,
 					env.Name,
 					evar.Name,

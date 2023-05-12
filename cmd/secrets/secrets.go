@@ -1,6 +1,7 @@
 package secrets
 
 import (
+	createCmd "github.com/katiem0/gh-environments/cmd/secrets/create"
 	listCmd "github.com/katiem0/gh-environments/cmd/secrets/list"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +16,7 @@ func NewCmdSecrets() *cobra.Command {
 	}
 	cmd.Flags().Bool("help", false, "Show help for command")
 	cmd.AddCommand(listCmd.NewCmdList())
-	//cmd.AddCommand(createCmd.NewCmdCreate())
+	cmd.AddCommand(createCmd.NewCmdCreate())
 
 	return cmd
 }

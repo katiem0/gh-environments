@@ -9,15 +9,16 @@ import (
 )
 
 type Getter interface {
-	GetReposList(owner string, endCursor *string) ([]data.ReposQuery, error)
-	GetRepo(owner string, name string) ([]data.RepoSingleQuery, error)
-	GetRepoEnvironments(owner string, repo string) ([]byte, error)
-	GetDeploymentBranchPolicies(owner string, repo string, env string) ([]byte, error)
-	GetEnvironmentVariables(repo_id int, env string) ([]byte, error)
 	CreateEnvironmentVariables(repo_id int, env string, data io.Reader) error
 	CreateEnvironmentSecret(repo_id int, env string, secret string, data io.Reader) error
+	EncryptSecret(publickey string, secret string) (string, error)
+	GetDeploymentBranchPolicies(owner string, repo string, env string) ([]byte, error)
 	GetEnvironmentPublicKey(repo_id int, env string) ([]byte, error)
+	GetEnvironmentVariables(repo_id int, env string) ([]byte, error)
 	GetEnvironmentSecrets(repo_id int, env string) ([]byte, error)
+	GetRepo(owner string, name string) ([]data.RepoSingleQuery, error)
+	GetRepoEnvironments(owner string, repo string) ([]byte, error)
+	GetReposList(owner string, endCursor *string) ([]data.ReposQuery, error)
 }
 
 type APIGetter struct {
