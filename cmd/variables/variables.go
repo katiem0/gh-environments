@@ -11,7 +11,7 @@ func NewCmdVariables() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "variables <command>",
 		Short: "List and Create Environment variables.",
-		Long:  "List and Create Environment variables for an organization, repository, or environment.",
+		Long:  "List and Create Environment specific variables in repositories under an organization.",
 	}
 	cmd.Flags().Bool("help", false, "Show help for command")
 

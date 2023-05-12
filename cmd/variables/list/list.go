@@ -34,8 +34,8 @@ func NewCmdList() *cobra.Command {
 
 	exportCmd := cobra.Command{
 		Use:   "list [flags] <organization> [repo ...] ",
-		Short: "Generate a report of Environment variables for an organization and/or repositories.",
-		Long:  "Generate a report of Environment variables for an organization and/or repositories.",
+		Short: "Generate a report of Environment variable.",
+		Long:  "Generate a report of variables for each environment per repository in an organization.",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(exportCmd *cobra.Command, args []string) error {
 			var err error

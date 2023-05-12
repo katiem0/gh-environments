@@ -67,7 +67,7 @@ The output `csv` file contains the following information:
 |`RepositoryID`| The `ID` associated with the Repository, for API usage. |
 |`EnvironmentName`| The name of the repository specific environment. |
 |`AdminBypass`| `True`/`False` flag to indicate if administrators are allowed to bypass configured protection rules. |
-|`WaitTimer| The an amount of time to wait before allowing deployments to proceed. |
+|`WaitTimer`| The an amount of time to wait before allowing deployments to proceed. |
 |`Reviewers`| Specified people or teams that have the ability to approve workflow runs when tey access the environment. |
 |`BranchPolicyType`| Indicates if the environment can only be deployed to specific branches. (Values: `protected`, `custom`, or `null`, where `null` indicates **any branch from the repo can deploy**.)|
 |`Branches`| If `BranchPolicyType = custom`, list of specific branch name patterns the environment deployment is limited to|
@@ -76,4 +76,166 @@ The output `csv` file contains the following information:
 
 ### Environment Secrets
 
+The `gh environment secrets` command comprises of two subcommands, `list` and `create`, to access and create Environment specific Secrets.
+
+```sh
+$ gh environments secrets -h
+
+List and Create Environment specific secrets in repositories.
+
+Usage:
+  environments secrets [command]
+
+Available Commands:
+  create      Create Environment secrets.
+  list        Generate a report of Environment secrets.
+
+Flags:
+      --help   Show help for command
+
+Use "environments secrets [command] --help" for more information about a command.
+```
+
+Both the `create` and `list` commands utilize the following fields:
+
+| Field Name | Description |
+|:-----------|:------------|
+|`RepositoryID`| The `ID` associated with the Repository, for API usage. |
+|`RepositoryName` | The name of the repository where the data is extracted from. |
+|`EnvironmentName`| The name of the repository specific environment. |
+|`SecretName`| The name of the secret|
+|`SecretValue`| Will be blank for `list`, and is required for `create` |
+|`SecretCreatedAt`| The timestamp associated with when the secret was initially created. |
+|`SecretUpdatedAt`| The timestamp associated with the last time the secret was modified. |
+
+#### Create Secrets
+
+The `gh environments secrets create` command will create secrets from a `csv` file using `--from-file` following the format outlined in [`gh environments secrets`](#environment-secrets).
+
+>**Note**
+> The `SecretValue` specified in the `csv` file is be [encrypted using the associated `public key`](https://docs.github.com/en/actions/security-guides/encrypted-secrets) before the environment secret is created.
+
+```sh
+$ gh environments secrets create -h
+
+Create Environment secrets for specified environments per repository in an organization from a file.
+
+Usage:
+  environments secrets create <organization> [flags]
+
+Flags:
+  -d, --debug              To debug logging
+  -f, --from-file string   Path and Name of CSV file to create secrets from
+      --hostname string    GitHub Enterprise Server hostname (default "github.com")
+  -t, --token string       GitHub personal access token for organization to write to (default "gh auth token")
+
+Global Flags:
+      --help   Show help for command
+```
+
+#### List Secrets
+
+The `gh environments secrets list` command generates a `csv` report of environment specific secrets for the specified `<organization>` or `[repo ..]` list. If `[repo ...]` is specified, **secrets associated to environments across all repositories will be captured**. The report will contain secrets produces a `csv` report containing the fields outlined in [`gh environments secrets`](#environment-secrets).
+
+>**Note**
+> The `SecretValue` specified in the `csv` file will be left blank. **Secret values will NOT be extracted.**
+
+
+```sh
+$ gh environments secrets list -h
+
+Generate a report of secrets for each environment per repository in an organization.
+
+Usage:
+  environments secrets list [flags] <organization> [repo ...] 
+
+Flags:
+  -d, --debug                To debug logging
+      --hostname string      GitHub Enterprise Server hostname (default "github.com")
+  -o, --output-file string   Name of file to write CSV report (default "report-20230512134718.csv")
+  -t, --token string         GitHub Personal Access Token (default "gh auth token")
+
+Global Flags:
+      --help   Show help for command
+```
+
+
 ### Environment Variables
+
+The `gh environment variables` command comprises of two subcommands, `list` and `create`, to access and create Environment specific variables.
+
+```sh
+$  gh environments variables -h
+
+List and Create Environment specific variables in repositories under an organization.
+
+Usage:
+  environments variables [command]
+
+Available Commands:
+  create      Create Environment variables.
+  list        Generate a report of Environment variable.
+
+Flags:
+      --help   Show help for command
+
+Use "environments variables [command] --help" for more information about a command.
+```
+
+Both the `create` and `list` commands utilize the following fields:
+
+| Field Name | Description |
+|:-----------|:------------|
+|`RepositoryID`| The `ID` associated with the Repository, for API usage. |
+|`RepositoryName` | The name of the repository where the data is extracted from. |
+|`EnvironmentName`| The name of the repository specific environment. |
+|`VariableName`| The name of the variable|
+|`VariableValue`| The value of the variable |
+|`VariableCreatedAt`| The timestamp associated with when the variable was initially created. |
+|`VariableUpdatedAt`| The timestamp associated with the last time the variable was modified. |
+
+#### Create Variables
+
+The `gh environments variables create` command will create variables from a `csv` file using `--from-file` following the format outlined in [`gh environments variables`](#environment-variables).
+
+
+
+```sh
+$ gh environments variables create -h
+
+Create Environment variables for specified environments per repository in an organization from a file.
+
+Usage:
+  environments variables create <organization> [flags]
+
+Flags:
+  -d, --debug              To debug logging
+  -f, --from-file string   Path and Name of CSV file to create variables from
+      --hostname string    GitHub Enterprise Server hostname (default "github.com")
+  -t, --token string       GitHub personal access token for organization to write to (default "gh auth token")
+
+Global Flags:
+      --help   Show help for command
+```
+
+#### List Variables
+
+The `gh environments variables list` command generates a `csv` report of environment specific secrets for the specified `<organization>` or `[repo ..]` list. If `[repo ...]` is specified, **variables associated to environments across all repositories will be captured**. The report will contain variables produces a `csv` report containing the fields outlined in [`gh environments variables`](#environment-variables).
+
+
+```sh
+$ gh environments variables list -h
+
+Generate a report of variables for each environment per repository in an organization.
+
+Usage:
+  environments variables list [flags] <organization> [repo ...] 
+
+Flags:
+  -d, --debug                To debug logging
+      --hostname string      GitHub Enterprise Server hostname (default "github.com")
+  -o, --output-file string   Name of file to write CSV report (default "report-20230512135332.csv")
+  -t, --token string         GitHub Personal Access Token (default "gh auth token")
+
+Global Flags:
+      --help   Show help for command
