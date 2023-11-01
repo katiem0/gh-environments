@@ -8,7 +8,7 @@ A GitHub `gh` [CLI](https://cli.github.com/) extension to list environments and 
 
 2. Install the extension:
    ```sh
-   gh extension install katiem0/gh-organization-webhooks
+   gh extension install katiem0/gh-environments-webhooks
    ```
 
 For more information: [`gh extension install`](https://cli.github.com/manual/gh_extension_install).
