@@ -68,7 +68,8 @@ The output `csv` file contains the following information:
 |`EnvironmentName`| The name of the repository specific environment. |
 |`AdminBypass`| `True`/`False` flag to indicate if administrators are allowed to bypass configured protection rules. |
 |`WaitTimer`| The an amount of time to wait before allowing deployments to proceed. |
-|`Reviewers`| Specified people or teams that have the ability to approve workflow runs when tey access the environment. |
+|`Reviewers`| Specified people or teams that have the ability to approve workflow runs when they access the environment. |
+|`PreventSelfReview` | Indicates if a Reviewer is able to approve/deny the workflow run on a specific environment |
 |`BranchPolicyType`| Indicates if the environment can only be deployed to specific branches. (Values: `protected`, `custom`, or `null`, where `null` indicates **any branch from the repo can deploy**.)|
 |`Branches`| If `BranchPolicyType = custom`, list of specific branch name patterns the environment deployment is limited to|
 |`SecretsTotalCount`| The number of Actions secrets that are associated with the environment. |

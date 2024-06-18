@@ -22,7 +22,6 @@ import (
 )
 
 type cmdFlags struct {
-	app        string
 	hostname   string
 	token      string
 	reportFile string
@@ -109,7 +108,6 @@ func NewCmdList() *cobra.Command {
 	listCmd.PersistentFlags().StringVarP(&cmdFlags.hostname, "hostname", "", "github.com", "GitHub Enterprise Server hostname")
 	listCmd.Flags().StringVarP(&cmdFlags.reportFile, "output-file", "o", reportFileDefault, "Name of file to write CSV report")
 	listCmd.PersistentFlags().BoolVarP(&cmdFlags.debug, "debug", "d", false, "To debug logging")
-	//cmd.MarkPersistentFlagRequired("app")
 
 	return &listCmd
 }
@@ -127,6 +125,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		"AdminBypass",
 		"WaitTimer",
 		"Reviewers",
+		"PreventSelfReview",
 		"BranchPolicyType",
 		"Branches",
 		"SecretsTotalCount",
@@ -188,6 +187,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		zap.S().Debugf("Writing data for %d environment(s) to output for repository %s", responseEnvs.TotalCount, singleRepo.Name)
 		for _, env := range responseEnvs.Environments {
 			var waitTimer int
+			var preventSelfReview bool
 			var Reviewers []string
 			var BranchPolicyType string
 			var Branches string
@@ -198,6 +198,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 
 				} else if rules.Type == "required_reviewers" {
 					zap.S().Debugf("Gathering Required Reviewers for environment %s", env.Name)
+					preventSelfReview = rules.PreventSelfReview
 					for _, reviewer := range rules.Reviewers {
 						var reviewList []string
 						reviewList = append(reviewList, reviewer.Type)
@@ -264,7 +265,8 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 				env.Name,
 				strconv.FormatBool(env.AdminByPass),
 				strconv.Itoa(waitTimer),
-				fmt.Sprintf(strings.Join(Reviewers, "|")),
+				strings.Join(Reviewers, "|"),
+				strconv.FormatBool(preventSelfReview),
 				BranchPolicyType,
 				Branches,
 				strconv.Itoa(envSecrets.TotalCount),
@@ -277,7 +279,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		}
 	}
 	csvWriter.Flush()
-	fmt.Printf("Successfully exported environment data to csv %s", cmdFlags.reportFile)
+	fmt.Print("Successfully exported environment data to csv ", cmdFlags.reportFile)
 
 	return nil
 }
