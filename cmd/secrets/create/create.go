@@ -122,7 +122,7 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 		for _, secret := range secretList {
 
 			zap.S().Debugf("Gathering secret %s for repo %s and env %s", secret.Name, secret.RepositoryName, secret.EnvironmentName)
-			publicKey, err := g.GetEnvironmentPublicKey(secret.RepositoryID, secret.EnvironmentName)
+			publicKey, err := g.GetEnvironmentPublicKey(owner, secret.RepositoryName, secret.EnvironmentName)
 			if err != nil {
 				zap.S().Errorf("Error arose reading secret from csv file")
 			}
@@ -131,11 +131,13 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 			if err != nil {
 				return err
 			}
+
 			encryptedSecret, err := g.EncryptSecret(responsePublicKey.Key, secret.Value)
 			if err != nil {
 				return err
 			}
 			importSecret := utils.CreateSecretData(responsePublicKey.KeyID, encryptedSecret)
+			fmt.Println(importSecret)
 			createSecret, err := json.Marshal(importSecret)
 
 			if err != nil {
@@ -144,7 +146,7 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 
 			reader := bytes.NewReader(createSecret)
 			zap.S().Debugf("Creating secret %s under %s/%s for env %s", secret.Name, owner, secret.RepositoryName, secret.EnvironmentName)
-			err = g.CreateEnvironmentSecret(secret.RepositoryID, secret.EnvironmentName, secret.Name, reader)
+			err = g.CreateEnvironmentSecret(owner, secret.RepositoryName, secret.EnvironmentName, secret.Name, reader)
 			if err != nil {
 				zap.S().Errorf("Error arose creating variable with %s", secret.Name)
 			}

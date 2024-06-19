@@ -262,7 +262,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 
 			//Get Secret Total Count
 			zap.S().Debugf("Gathering Count of Secrets for environment %s", env.Name)
-			envSecretResp, err := g.GetEnvironmentSecrets(singleRepo.DatabaseId, env.Name)
+			envSecretResp, err := g.GetEnvironmentSecrets(owner, singleRepo.Name, env.Name)
 			if err != nil {
 				zap.S().Error("Error raised in writing output", zap.Error(err))
 			}
@@ -274,7 +274,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 
 			//Get Variable total Count
 			zap.S().Debugf("Gathering Count of Variables for environment %s", env.Name)
-			envVarsResp, err := g.GetEnvironmentVariables(singleRepo.DatabaseId, env.Name)
+			envVarsResp, err := g.GetEnvironmentVariables(owner, singleRepo.Name, env.Name)
 			if err != nil {
 				zap.S().Error("Error raised in writing output", zap.Error(err))
 			}
