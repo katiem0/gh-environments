@@ -120,7 +120,7 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 		zap.S().Debugf("Determining environments to create")
 
 		for _, environment := range environmentList {
-			zap.S().Debugf("Gathering environment %s for repo %s", environment.EnvironmentName, environment.RepositoryName)
+			fmt.Printf("Gathering environment %s for repo %s", environment.EnvironmentName, environment.RepositoryName)
 			importEnv := utils.CreateEnvironmentData(environment)
 			createEnvironment, err := json.Marshal(importEnv)
 			if err != nil {
@@ -132,7 +132,6 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 			if err != nil {
 				zap.S().Errorf("Error arose creating environment %s", environment.EnvironmentName)
 			}
-			fmt.Println(environment.EnvironmentName)
 			if environment.DeploymentPolicy == "custom" {
 				zap.S().Debugf("Creating Branch/Tag Deployment Policy for %s/%s/%s", owner, environment.RepositoryName, environment.EnvironmentName)
 				for _, branch := range environment.Branches {
