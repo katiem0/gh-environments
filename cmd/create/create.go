@@ -31,7 +31,7 @@ func NewCmdCreate() *cobra.Command {
 
 	createCmd := cobra.Command{
 		Use:   "create  <target organization> [flags]",
-		Short: "create environments and metadata.",
+		Short: "Create environments and metadata.",
 		Long:  "Create environments and metadata for specified environments per repository in an organization from a file.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(createCmd *cobra.Command, args []string) error {
@@ -132,7 +132,7 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 			if err != nil {
 				zap.S().Errorf("Error arose creating environment %s", environment.EnvironmentName)
 			}
-
+			fmt.Println(environment.EnvironmentName)
 			if environment.DeploymentPolicy == "custom" {
 				zap.S().Debugf("Creating Branch/Tag Deployment Policy for %s/%s/%s", owner, environment.RepositoryName, environment.EnvironmentName)
 				for _, branch := range environment.Branches {

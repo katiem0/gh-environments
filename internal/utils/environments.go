@@ -120,11 +120,6 @@ func CreateEnvironmentData(environment data.ImportedEnvironment) *data.CreateEnv
 			ProtectedBranches: false,
 			CustomPolicies:    true,
 		}
-	} else {
-		deploymentPolicy = &data.DeploymentPolicy{
-			ProtectedBranches: false,
-			CustomPolicies:    false,
-		}
 	}
 
 	s := data.CreateEnvironment{
@@ -133,6 +128,7 @@ func CreateEnvironmentData(environment data.ImportedEnvironment) *data.CreateEnv
 		Reviewers:              createReviewers,
 		DeploymentBranchPolicy: deploymentPolicy,
 	}
+	fmt.Println(s)
 	return &s
 }
 
@@ -156,4 +152,18 @@ func (g *APIGetter) CreateDeploymentBranches(owner string, repo string, env stri
 	}
 	defer resp.Body.Close()
 	return err
+}
+
+func (g *APIGetter) GetDeploymentProtectionRules(owner string, repo string, env string) ([]byte, error) {
+	url := fmt.Sprintf("repos/%s/%s/environments/%s/deployment_protection_rules", owner, repo, env)
+	resp, err := g.restClient.Request("GET", url, nil)
+	if err != nil {
+		log.Printf("Body read error, %v", err)
+	}
+	defer resp.Body.Close()
+	responseData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Body read error, %v", err)
+	}
+	return responseData, err
 }

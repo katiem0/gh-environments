@@ -28,9 +28,25 @@ type CreateDeploymentBranch struct {
 	Type string `json:"type"`
 }
 
+type DeploymentApp struct {
+	IntegrationID int    `json:"id"`
+	Slug          string `json:"slug"`
+}
+
 type DeploymentPolicy struct {
 	ProtectedBranches bool `json:"protected_branches"`
 	CustomPolicies    bool `json:"custom_branch_policies"`
+}
+
+type DeploymentProtectionPolicy struct {
+	TotalCount            int                             `json:"total_count"`
+	CustomDeploymentRules []DeploymentProtectionPolicyApp `json:"custom_deployment_protection_rules"`
+}
+
+type DeploymentProtectionPolicyApp struct {
+	PolicyID int           `json:"id"`
+	Enabled  bool          `json:"enabled"`
+	App      DeploymentApp `json:"app"`
 }
 
 type EnvResponse struct {

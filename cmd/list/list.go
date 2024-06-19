@@ -128,6 +128,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		"PreventSelfReview",
 		"BranchPolicyType",
 		"Branches",
+		"CustomDeploymentProtectionPolicy",
 		"SecretsTotalCount",
 		"VariablesTotalCount",
 	})
@@ -191,6 +192,8 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 			var Reviewers []string
 			var BranchPolicyType string
 			var Branches []string
+			var Apps []string
+
 			for _, rules := range env.ProtectionRules {
 				zap.S().Debugf("Gathering Protection Rules for environment %s", env.Name)
 				if rules.Type == "wait_timer" {
@@ -234,6 +237,29 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 				}
 			}
 
+			//Get enabled Custom Deployment Protection Policies for Env
+			zap.S().Debugf("Gathering Custom Deployment Protection Policies for environment %s", env.Name)
+			envProtectionResp, err := g.GetDeploymentProtectionRules(owner, singleRepo.Name, env.Name)
+			if err != nil {
+				zap.S().Error("Error raised in writing output", zap.Error(err))
+			}
+			var envDeploymentProtectionPolicy data.DeploymentProtectionPolicy
+			err = json.Unmarshal(envProtectionResp, &envDeploymentProtectionPolicy)
+			if err != nil {
+				return err
+			}
+			for _, apps := range envDeploymentProtectionPolicy.CustomDeploymentRules {
+				zap.S().Debugf("Gathering Custom DeploymentProtection Rules for environment %s", env.Name)
+				fmt.Println(apps)
+				var appList []string
+				appList = append(appList, strconv.Itoa(apps.PolicyID))
+				appList = append(appList, strconv.FormatBool(apps.Enabled))
+				appList = append(appList, strconv.Itoa(apps.App.IntegrationID))
+				appList = append(appList, apps.App.Slug)
+				AppLists := strings.Join(appList, ";")
+				Apps = append(Apps, AppLists)
+			}
+
 			//Get Secret Total Count
 			zap.S().Debugf("Gathering Count of Secrets for environment %s", env.Name)
 			envSecretResp, err := g.GetEnvironmentSecrets(singleRepo.DatabaseId, env.Name)
@@ -271,6 +297,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 				strconv.FormatBool(preventSelfReview),
 				BranchPolicyType,
 				strings.Join(Branches, "|"),
+				strings.Join(Apps, "|"),
 				strconv.Itoa(envSecrets.TotalCount),
 				strconv.Itoa(envVars.TotalCount),
 			})
