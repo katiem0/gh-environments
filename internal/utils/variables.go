@@ -9,8 +9,8 @@ import (
 	"github.com/katiem0/gh-environments/internal/data"
 )
 
-func (g *APIGetter) CreateEnvironmentVariables(repo_id int, env string, data io.Reader) error {
-	url := fmt.Sprintf("repositories/%s/environments/%s/variables", strconv.Itoa(repo_id), env)
+func (g *APIGetter) CreateEnvironmentVariables(owner string, repo string, env string, data io.Reader) error {
+	url := fmt.Sprintf("repos/%s/%s/environments/%s/variables", owner, repo, env)
 
 	resp, err := g.restClient.Request("POST", url, data)
 	if err != nil {
@@ -44,8 +44,8 @@ func (g *APIGetter) CreateVariableList(filedata [][]string) []data.ImportedVaria
 	return variableList
 }
 
-func (g *APIGetter) GetEnvironmentVariables(repo_id int, env string) ([]byte, error) {
-	url := fmt.Sprintf("repositories/%s/environments/%s/variables", strconv.Itoa(repo_id), env)
+func (g *APIGetter) GetEnvironmentVariables(owner string, repo string, env string) ([]byte, error) {
+	url := fmt.Sprintf("repos/%s/%s/environments/%s/variables", owner, repo, env)
 	resp, err := g.restClient.Request("GET", url, nil)
 	if err != nil {
 		log.Printf("Body read error, %v", err)

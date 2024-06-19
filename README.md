@@ -153,7 +153,7 @@ Both the `create` and `list` commands utilize the following fields:
 The `gh environments secrets create` command will create secrets from a `csv` file using `--from-file` following the format outlined in [`gh environments secrets`](#environment-secrets).
 
 >**Note**
-> The `SecretValue` specified in the `csv` file is be [encrypted using the associated `public key`](https://docs.github.com/en/actions/security-guides/encrypted-secrets) before the environment secret is created.
+> The `SecretValue` specified in the `csv` file will be [encrypted using the associated `public key`](https://docs.github.com/en/actions/security-guides/encrypted-secrets) before the environment secret is created.
 
 ```sh
 $ gh environments secrets create -h

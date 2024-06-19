@@ -12,8 +12,8 @@ import (
 	"golang.org/x/crypto/nacl/box"
 )
 
-func (g *APIGetter) CreateEnvironmentSecret(repo_id int, env string, secret string, data io.Reader) error {
-	url := fmt.Sprintf("repositories/%s/environments/%s/secrets/%s", strconv.Itoa(repo_id), env, secret)
+func (g *APIGetter) CreateEnvironmentSecret(owner string, repo string, env string, secret string, data io.Reader) error {
+	url := fmt.Sprintf("repos/%s/%s/environments/%s/secrets/%s", owner, repo, env, secret)
 
 	resp, err := g.restClient.Request("PUT", url, data)
 	if err != nil {
@@ -47,30 +47,27 @@ func (g *APIGetter) CreateSecretList(filedata [][]string) []data.ImportedSecret 
 	return secretList
 }
 
-func (g *APIGetter) EncryptSecret(publickey string, secret string) (string, error) {
-	var pkBytes [32]byte
-	copy(pkBytes[:], publickey)
-	secretBytes := secret
-
-	out := make([]byte, 0,
-		len(secretBytes)+
-			box.Overhead+
-			len(pkBytes))
-
-	enc, err := box.SealAnonymous(
-		out, []byte(secretBytes), &pkBytes, rand.Reader,
-	)
+func (g *APIGetter) EncryptSecret(publicKey string, secret string) (string, error) {
+	bytes, err := base64.StdEncoding.DecodeString(publicKey)
 	if err != nil {
 		return "", err
 	}
 
-	encEnc := base64.StdEncoding.EncodeToString(enc)
+	var decodedKey [32]byte
+	copy(decodedKey[:], bytes)
 
-	return encEnc, nil
+	encrypted, err := box.SealAnonymous(nil, []byte(secret), (*[32]byte)(bytes), rand.Reader)
+	if err != nil {
+		return "", err
+	}
+	// Encode the encrypted value in base64
+	encryptedValue := base64.StdEncoding.EncodeToString(encrypted)
+
+	return encryptedValue, nil
 }
 
-func (g *APIGetter) GetEnvironmentPublicKey(repo_id int, env string) ([]byte, error) {
-	url := fmt.Sprintf("repositories/%s/environments/%s/secrets/public-key", strconv.Itoa(repo_id), env)
+func (g *APIGetter) GetEnvironmentPublicKey(owner string, repo string, env string) ([]byte, error) {
+	url := fmt.Sprintf("repos/%s/%s/environments/%s/secrets/public-key", owner, repo, env)
 	resp, err := g.restClient.Request("GET", url, nil)
 	if err != nil {
 		log.Printf("Body read error, %v", err)
@@ -83,8 +80,8 @@ func (g *APIGetter) GetEnvironmentPublicKey(repo_id int, env string) ([]byte, er
 	return responseData, err
 }
 
-func (g *APIGetter) GetEnvironmentSecrets(repo_id int, env string) ([]byte, error) {
-	url := fmt.Sprintf("repositories/%s/environments/%s/secrets", strconv.Itoa(repo_id), env)
+func (g *APIGetter) GetEnvironmentSecrets(owner string, repo string, env string) ([]byte, error) {
+	url := fmt.Sprintf("repos/%s/%s/environments/%s/secrets", owner, repo, env)
 	resp, err := g.restClient.Request("GET", url, nil)
 	if err != nil {
 		log.Printf("Body read error, %v", err)

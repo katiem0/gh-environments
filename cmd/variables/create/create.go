@@ -129,7 +129,7 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 			}
 			reader := bytes.NewReader(createVariable)
 			zap.S().Debugf("Creating variable %s under %s/%s for env %s", variable.Name, owner, variable.RepositoryName, variable.EnvironmentName)
-			err = g.CreateEnvironmentVariables(variable.RepositoryID, variable.EnvironmentName, reader)
+			err = g.CreateEnvironmentVariables(owner, variable.RepositoryName, variable.EnvironmentName, reader)
 			if err != nil {
 				zap.S().Errorf("Error arose creating variable with %s", variable.Name)
 			}

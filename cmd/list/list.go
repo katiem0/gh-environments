@@ -271,7 +271,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 
 			//Get Secret Total Count
 			zap.S().Debugf("Gathering Count of Secrets for environment %s", env.Name)
-			envSecretResp, err := g.GetEnvironmentSecrets(singleRepo.DatabaseId, env.Name)
+			envSecretResp, err := g.GetEnvironmentSecrets(owner, singleRepo.Name, env.Name)
 			if err != nil {
 				if strings.Contains(err.Error(), "404: Not Found") {
 					zap.S().Debug("No secrets found for environment")
@@ -288,7 +288,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 
 			//Get Variable total Count
 			zap.S().Debugf("Gathering Count of Variables for environment %s", env.Name)
-			envVarsResp, err := g.GetEnvironmentVariables(singleRepo.DatabaseId, env.Name)
+			envVarsResp, err := g.GetEnvironmentVariables(owner, singleRepo.Name, env.Name)
 			if err != nil {
 				if strings.Contains(err.Error(), "404: Not Found") {
 					zap.S().Debug("No variables found for environment")

@@ -175,16 +175,22 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		}
 		var envList data.EnvResponse
 		err = json.Unmarshal(envListResp, &envList)
+		if err != nil {
+			return err
+		}
 
 		for _, env := range envList.Environments {
 			zap.S().Debugf("Gathering environment %s secrets for %s", env.Name, singleRepo.Name)
-			envSecretResp, err := g.GetEnvironmentSecrets(singleRepo.DatabaseId, env.Name)
+			envSecretResp, err := g.GetEnvironmentSecrets(owner, singleRepo.Name, env.Name)
 			if err != nil {
 				zap.S().Error("Error raised in getting environment secrets", zap.Error(err))
 			}
 
 			var envSecret data.EnvSecret
 			err = json.Unmarshal(envSecretResp, &envSecret)
+			if err != nil {
+				return err
+			}
 
 			for _, eSecret := range envSecret.Secrets {
 				err = csvWriter.Write([]string{

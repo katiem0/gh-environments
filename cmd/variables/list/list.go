@@ -95,7 +95,7 @@ func NewCmdList() *cobra.Command {
 				return err
 			}
 
-			return runCmdList(owner, repos, &cmdFlags, utils.NewAPIGetter(gqlClient, restClient), reportWriter)
+			return runCmdList(owner, repos, utils.NewAPIGetter(gqlClient, restClient), reportWriter)
 		},
 	}
 
@@ -111,7 +111,7 @@ func NewCmdList() *cobra.Command {
 	return &exportCmd
 }
 
-func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGetter, reportWriter io.Writer) error {
+func runCmdList(owner string, repos []string, g *utils.APIGetter, reportWriter io.Writer) error {
 	var reposCursor *string
 	var allRepos []data.RepoInfo
 
@@ -175,16 +175,22 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		}
 		var envList data.EnvResponse
 		err = json.Unmarshal(envListResp, &envList)
+		if err != nil {
+			return err
+		}
 
 		for _, env := range envList.Environments {
 			zap.S().Debugf("Gathering environment %s variables for %s", env.Name, singleRepo.Name)
-			envVarsResp, err := g.GetEnvironmentVariables(singleRepo.DatabaseId, env.Name)
+			envVarsResp, err := g.GetEnvironmentVariables(owner, singleRepo.Name, env.Name)
 			if err != nil {
 				zap.S().Error("Error raised in getting environment variables", zap.Error(err))
 			}
 
 			var envVars data.EnvVariables
 			err = json.Unmarshal(envVarsResp, &envVars)
+			if err != nil {
+				return err
+			}
 
 			for _, evar := range envVars.Variables {
 				err = csvWriter.Write([]string{
