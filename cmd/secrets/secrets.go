@@ -12,7 +12,7 @@ func NewCmdSecrets() *cobra.Command {
 		Use:   "secrets <command> [flags]",
 		Args:  cobra.MinimumNArgs(1),
 		Short: "List and Create Environment secrets.",
-		Long:  "List and Create Environment specific secrets in repositories.",
+		Long:  "List and Create Environment specific secrets in repositories under an organization.",
 	}
 	cmd.Flags().Bool("help", false, "Show help for command")
 	cmd.AddCommand(listCmd.NewCmdList())

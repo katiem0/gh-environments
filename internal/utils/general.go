@@ -9,10 +9,15 @@ import (
 )
 
 type Getter interface {
+	CreateEnvironment(owner string, repo string, env string, data io.Reader) error
+	CreateEnvironmentList(filedata [][]string) []data.ImportedEnvironment
 	CreateEnvironmentVariables(repo_id int, env string, data io.Reader) error
 	CreateEnvironmentSecret(repo_id int, env string, secret string, data io.Reader) error
+	CreateDeploymentBranches(owner string, repo string, env string, data io.Reader) error
+	CreateSecretList(filedata [][]string) []data.ImportedSecret
 	EncryptSecret(publickey string, secret string) (string, error)
 	GetDeploymentBranchPolicies(owner string, repo string, env string) ([]byte, error)
+	GetDeploymentProtectionRules(owner string, repo string, env string) ([]byte, error)
 	GetEnvironmentPublicKey(repo_id int, env string) ([]byte, error)
 	GetEnvironmentVariables(repo_id int, env string) ([]byte, error)
 	GetEnvironmentSecrets(repo_id int, env string) ([]byte, error)
