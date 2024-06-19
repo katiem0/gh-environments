@@ -8,6 +8,7 @@ type BranchPolicies struct {
 type BranchPolicy struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Type string `json:"type"`
 }
 
 type CreateEnvironment struct {
@@ -20,6 +21,11 @@ type CreateEnvironment struct {
 type CreateReviewer struct {
 	Type string `json:"type"`
 	ID   int    `json:"id"`
+}
+
+type CreateDeploymentBranch struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
 }
 
 type DeploymentPolicy struct {
@@ -48,6 +54,7 @@ type ImportedEnvironment struct {
 	Reviewers         []Reviewers
 	PreventSelfReview bool
 	DeploymentPolicy  string
+	Branches          []CreateDeploymentBranch
 }
 
 type Rules struct {

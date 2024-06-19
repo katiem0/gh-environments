@@ -190,7 +190,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 			var preventSelfReview bool
 			var Reviewers []string
 			var BranchPolicyType string
-			var Branches string
+			var Branches []string
 			for _, rules := range env.ProtectionRules {
 				zap.S().Debugf("Gathering Protection Rules for environment %s", env.Name)
 				if rules.Type == "wait_timer" {
@@ -221,11 +221,13 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 						if err != nil {
 							return err
 						}
-						var branchList []string
 						for _, branch := range branchEnvs.BranchPolicies {
+							var branchList []string
 							branchList = append(branchList, branch.Name)
+							branchList = append(branchList, branch.Type)
+							BranchLists := strings.Join(branchList, ";")
+							Branches = append(Branches, BranchLists)
 						}
-						Branches = strings.Join(branchList, ";")
 					} else if env.DeploymentPolicy.ProtectedBranches {
 						BranchPolicyType = "protected"
 					}
@@ -268,7 +270,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 				strings.Join(Reviewers, "|"),
 				strconv.FormatBool(preventSelfReview),
 				BranchPolicyType,
-				Branches,
+				strings.Join(Branches, "|"),
 				strconv.Itoa(envSecrets.TotalCount),
 				strconv.Itoa(envVars.TotalCount),
 			})

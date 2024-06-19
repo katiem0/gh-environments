@@ -45,6 +45,7 @@ func (g *APIGetter) CreateEnvironmentList(fileData [][]string) []data.ImportedEn
 
 	for _, each := range fileData[1:] {
 		var reviewers []data.Reviewers
+		var branches []data.CreateDeploymentBranch
 
 		envs.RepositoryName = each[0]
 		envs.RepositoryID, _ = strconv.Atoi(each[1])
@@ -77,6 +78,22 @@ func (g *APIGetter) CreateEnvironmentList(fileData [][]string) []data.ImportedEn
 		envs.PreventSelfReview, _ = strconv.ParseBool(each[6])
 		envs.DeploymentPolicy = each[7]
 
+		deploymentData := each[8]
+		deploymentDataParts := strings.Split(deploymentData, "|")
+		for _, policy := range deploymentDataParts {
+			policyFields := strings.Split(policy, ";")
+
+			if len(policyFields) == 2 {
+				branch := data.CreateDeploymentBranch{
+					Name: policyFields[0],
+					Type: policyFields[1],
+				}
+				branches = append(branches, branch)
+			} else {
+				log.Printf("No branches listed for environment %v", envs.EnvironmentName)
+			}
+		}
+		envs.Branches = branches
 		environmentList = append(environmentList, envs)
 	}
 	return environmentList
@@ -123,6 +140,17 @@ func (g *APIGetter) CreateEnvironment(owner string, repo string, env string, dat
 	url := fmt.Sprintf("repos/%s/%s/environments/%s", owner, repo, env)
 
 	resp, err := g.restClient.Request("PUT", url, data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	return err
+}
+
+func (g *APIGetter) CreateDeploymentBranches(owner string, repo string, env string, data io.Reader) error {
+	url := fmt.Sprintf("repos/%s/%s/environments/%s/deployment-branch-policies", owner, repo, env)
+
+	resp, err := g.restClient.Request("POST", url, data)
 	if err != nil {
 		log.Fatal(err)
 	}

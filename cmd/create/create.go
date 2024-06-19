@@ -11,6 +11,7 @@ import (
 	"github.com/cli/go-gh/pkg/api"
 	"github.com/cli/go-gh/pkg/auth"
 	"github.com/katiem0/gh-environments/internal/data"
+	"github.com/katiem0/gh-environments/internal/log"
 	"github.com/katiem0/gh-environments/internal/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -42,6 +43,12 @@ func NewCmdCreate() *cobra.Command {
 			} else {
 				t, _ := auth.TokenForHost(cmdFlags.hostname)
 				authToken = t
+			}
+
+			if cmdFlags.debug {
+				logger, _ := log.NewLogger(cmdFlags.debug)
+				defer logger.Sync() // nolint:errcheck
+				zap.ReplaceGlobals(logger)
 			}
 
 			gqlClient, err = gh.GQLClient(&api.ClientOptions{
@@ -109,15 +116,12 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 		}
 
 		environmentList = g.CreateEnvironmentList(environmentData)
-
 		zap.S().Debugf("Identifying Environments list to create under %s", owner)
 		zap.S().Debugf("Determining environments to create")
 
 		for _, environment := range environmentList {
-			fmt.Println(environment)
 			zap.S().Debugf("Gathering environment %s for repo %s", environment.EnvironmentName, environment.RepositoryName)
 			importEnv := utils.CreateEnvironmentData(environment)
-			fmt.Println(importEnv)
 			createEnvironment, err := json.Marshal(importEnv)
 			if err != nil {
 				return err
@@ -125,9 +129,23 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 			reader := bytes.NewReader(createEnvironment)
 			zap.S().Debugf("Creating Environment %s for %s/%s", environment.EnvironmentName, owner, environment.RepositoryName)
 			err = g.CreateEnvironment(owner, environment.RepositoryName, environment.EnvironmentName, reader)
-			fmt.Println(reader)
 			if err != nil {
 				zap.S().Errorf("Error arose creating environment %s", environment.EnvironmentName)
+			}
+
+			if environment.DeploymentPolicy == "custom" {
+				zap.S().Debugf("Creating Branch/Tag Deployment Policy for %s/%s/%s", owner, environment.RepositoryName, environment.EnvironmentName)
+				for _, branch := range environment.Branches {
+					createEnvironmentBranch, err := json.Marshal(branch)
+					if err != nil {
+						return err
+					}
+					readerBranch := bytes.NewReader(createEnvironmentBranch)
+					err = g.CreateDeploymentBranches(owner, environment.RepositoryName, environment.EnvironmentName, readerBranch)
+					if err != nil {
+						zap.S().Errorf("Error arose creating deployment policy for %s", environment.EnvironmentName)
+					}
+				}
 			}
 		}
 		// Gathering Envs for each repository listed
