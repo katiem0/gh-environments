@@ -100,7 +100,7 @@ func NewCmdList() *cobra.Command {
 	}
 
 	// Determine default report file based on current timestamp; for more info see https://pkg.go.dev/time#pkg-constants
-	reportFileDefault := fmt.Sprintf("report-%s.csv", time.Now().Format("20060102150405"))
+	reportFileDefault := fmt.Sprintf("report-variables-%s.csv", time.Now().Format("20060102150405"))
 	// Configure flags for command
 	exportCmd.PersistentFlags().StringVarP(&cmdFlags.token, "token", "t", "", `GitHub Personal Access Token (default "gh auth token")`)
 	exportCmd.PersistentFlags().StringVarP(&cmdFlags.hostname, "hostname", "", "github.com", "GitHub Enterprise Server hostname")
