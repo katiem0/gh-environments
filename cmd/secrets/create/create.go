@@ -137,7 +137,6 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 				return err
 			}
 			importSecret := utils.CreateSecretData(responsePublicKey.KeyID, encryptedSecret)
-			fmt.Println(importSecret)
 			createSecret, err := json.Marshal(importSecret)
 
 			if err != nil {

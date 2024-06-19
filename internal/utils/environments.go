@@ -128,7 +128,6 @@ func CreateEnvironmentData(environment data.ImportedEnvironment) *data.CreateEnv
 		Reviewers:              createReviewers,
 		DeploymentBranchPolicy: deploymentPolicy,
 	}
-	fmt.Println(s)
 	return &s
 }
 

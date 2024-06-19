@@ -258,7 +258,6 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 				}
 				for _, apps := range envDeploymentProtectionPolicy.CustomDeploymentRules {
 					zap.S().Debugf("Gathering Custom DeploymentProtection Rules for environment %s", env.Name)
-					fmt.Println(apps)
 					var appList []string
 					appList = append(appList, strconv.Itoa(apps.PolicyID))
 					appList = append(appList, strconv.FormatBool(apps.Enabled))
