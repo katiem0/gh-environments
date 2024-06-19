@@ -100,7 +100,7 @@ func NewCmdList() *cobra.Command {
 	}
 
 	// Determine default report file based on current timestamp; for more info see https://pkg.go.dev/time#pkg-constants
-	reportFileDefault := fmt.Sprintf("report-%s.csv", time.Now().Format("20060102150405"))
+	reportFileDefault := fmt.Sprintf("report-environments-%s.csv", time.Now().Format("20060102150405"))
 
 	// Configure flags for command
 
@@ -194,6 +194,10 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 			var Branches []string
 			var Apps []string
 
+			var envDeploymentProtectionPolicy data.DeploymentProtectionPolicy
+			var envVars data.EnvVariables
+			var envSecrets data.EnvSecret
+
 			for _, rules := range env.ProtectionRules {
 				zap.S().Debugf("Gathering Protection Rules for environment %s", env.Name)
 				if rules.Type == "wait_timer" {
@@ -241,51 +245,63 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 			zap.S().Debugf("Gathering Custom Deployment Protection Policies for environment %s", env.Name)
 			envProtectionResp, err := g.GetDeploymentProtectionRules(owner, singleRepo.Name, env.Name)
 			if err != nil {
-				zap.S().Error("Error raised in writing output", zap.Error(err))
-			}
-			var envDeploymentProtectionPolicy data.DeploymentProtectionPolicy
-			err = json.Unmarshal(envProtectionResp, &envDeploymentProtectionPolicy)
-			if err != nil {
-				return err
-			}
-			for _, apps := range envDeploymentProtectionPolicy.CustomDeploymentRules {
-				zap.S().Debugf("Gathering Custom DeploymentProtection Rules for environment %s", env.Name)
-				fmt.Println(apps)
-				var appList []string
-				appList = append(appList, strconv.Itoa(apps.PolicyID))
-				appList = append(appList, strconv.FormatBool(apps.Enabled))
-				appList = append(appList, strconv.Itoa(apps.App.IntegrationID))
-				appList = append(appList, apps.App.Slug)
-				AppLists := strings.Join(appList, ";")
-				Apps = append(Apps, AppLists)
+				if strings.Contains(err.Error(), "404: Not Found") {
+					zap.S().Debug("No custom deployment protection policies found for environment")
+				} else {
+					zap.S().Error("Error raised in writing output for deployment protection policies", zap.Error(err))
+				}
+			} else {
+
+				err = json.Unmarshal(envProtectionResp, &envDeploymentProtectionPolicy)
+				if err != nil {
+					return err
+				}
+				for _, apps := range envDeploymentProtectionPolicy.CustomDeploymentRules {
+					zap.S().Debugf("Gathering Custom DeploymentProtection Rules for environment %s", env.Name)
+					fmt.Println(apps)
+					var appList []string
+					appList = append(appList, strconv.Itoa(apps.PolicyID))
+					appList = append(appList, strconv.FormatBool(apps.Enabled))
+					appList = append(appList, strconv.Itoa(apps.App.IntegrationID))
+					appList = append(appList, apps.App.Slug)
+					AppLists := strings.Join(appList, ";")
+					Apps = append(Apps, AppLists)
+				}
 			}
 
 			//Get Secret Total Count
 			zap.S().Debugf("Gathering Count of Secrets for environment %s", env.Name)
 			envSecretResp, err := g.GetEnvironmentSecrets(singleRepo.DatabaseId, env.Name)
 			if err != nil {
-				zap.S().Error("Error raised in writing output", zap.Error(err))
-			}
-			var envSecrets data.EnvSecret
-			err = json.Unmarshal(envSecretResp, &envSecrets)
-			if err != nil {
-				return err
+				if strings.Contains(err.Error(), "404: Not Found") {
+					zap.S().Debug("No secrets found for environment")
+				} else {
+					zap.S().Error("Error raised in writing output for environment secrets", zap.Error(err))
+				}
+			} else {
+
+				err = json.Unmarshal(envSecretResp, &envSecrets)
+				if err != nil {
+					return err
+				}
 			}
 
 			//Get Variable total Count
 			zap.S().Debugf("Gathering Count of Variables for environment %s", env.Name)
 			envVarsResp, err := g.GetEnvironmentVariables(singleRepo.DatabaseId, env.Name)
 			if err != nil {
-				zap.S().Error("Error raised in writing output", zap.Error(err))
-			}
-			var envVars data.EnvVariables
-			err = json.Unmarshal(envVarsResp, &envVars)
-			if err != nil {
-				return err
-			}
+				if strings.Contains(err.Error(), "404: Not Found") {
+					zap.S().Debug("No variables found for environment")
+				} else {
+					zap.S().Error("Error raised in writing output for environment variables", zap.Error(err))
+				}
+			} else {
 
-			if err != nil {
-				zap.S().Error("Error raised in writing output", zap.Error(err))
+				err = json.Unmarshal(envVarsResp, &envVars)
+				if err != nil {
+					zap.S().Error("Error raised in writing output", zap.Error(err))
+					return err
+				}
 			}
 			err = csvWriter.Write([]string{
 				singleRepo.Name,

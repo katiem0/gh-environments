@@ -88,6 +88,7 @@ func (g *APIGetter) GetEnvironmentSecrets(repo_id int, env string) ([]byte, erro
 	resp, err := g.restClient.Request("GET", url, nil)
 	if err != nil {
 		log.Printf("Body read error, %v", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 	responseData, err := io.ReadAll(resp.Body)

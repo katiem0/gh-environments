@@ -159,11 +159,12 @@ func (g *APIGetter) GetDeploymentProtectionRules(owner string, repo string, env 
 	resp, err := g.restClient.Request("GET", url, nil)
 	if err != nil {
 		log.Printf("Body read error, %v", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Body read error, %v", err)
+		log.Printf("Body response data read error, %v", err)
 	}
 	return responseData, err
 }
