@@ -101,7 +101,7 @@ Global Flags:
       --help   Show help for command
 ```
 
-The `create` command utilizes the following fields in their given format: 
+The `create` command utilizes the following fields in their given format but expects all headers listed [Report Output](#report-output): 
 
 | Field Name | Description |
 |:-----------|:------------|
@@ -222,7 +222,7 @@ Flags:
 Use "environments variables [command] --help" for more information about a command.
 ```
 
-Both the `create` and `list` commands utilize the following fields but expects all headers listed [Report Output](#report-output): 
+Both the `create` and `list` commands utilize the following fields: 
 
 | Field Name | Description |
 |:-----------|:------------|
