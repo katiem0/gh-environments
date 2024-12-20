@@ -10,9 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/api"
-	"github.com/cli/go-gh/pkg/auth"
+	"github.com/cli/go-gh/v2/pkg/api"
+	"github.com/cli/go-gh/v2/pkg/auth"
 	"github.com/katiem0/gh-environments/internal/data"
 	"github.com/katiem0/gh-environments/internal/log"
 	"github.com/katiem0/gh-environments/internal/utils"
@@ -39,8 +38,8 @@ func NewCmdList() *cobra.Command {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(exportCmd *cobra.Command, args []string) error {
 			var err error
-			var gqlClient api.GQLClient
-			var restClient api.RESTClient
+			var gqlClient *api.GraphQLClient
+			var restClient *api.RESTClient
 
 			// Reinitialize logging if debugging was enabled
 			if cmdFlags.debug {
@@ -56,7 +55,7 @@ func NewCmdList() *cobra.Command {
 				authToken = t
 			}
 
-			gqlClient, err = gh.GQLClient(&api.ClientOptions{
+			gqlClient, err = api.NewGraphQLClient(api.ClientOptions{
 				Headers: map[string]string{
 					"Accept": "application/vnd.github.hawkgirl-preview+json",
 				},
@@ -69,7 +68,7 @@ func NewCmdList() *cobra.Command {
 				return err
 			}
 
-			restClient, err = gh.RESTClient(&api.ClientOptions{
+			restClient, err = api.NewRESTClient(api.ClientOptions{
 				Headers: map[string]string{
 					"Accept": "application/vnd.github+json",
 				},
@@ -95,7 +94,7 @@ func NewCmdList() *cobra.Command {
 				return err
 			}
 
-			return runCmdList(owner, repos, &cmdFlags, utils.NewAPIGetter(gqlClient, restClient), reportWriter)
+			return runCmdList(owner, repos, utils.NewAPIGetter(gqlClient, restClient), reportWriter)
 		},
 	}
 
@@ -111,7 +110,7 @@ func NewCmdList() *cobra.Command {
 	return &exportCmd
 }
 
-func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGetter, reportWriter io.Writer) error {
+func runCmdList(owner string, repos []string, g *utils.APIGetter, reportWriter io.Writer) error {
 	var reposCursor *string
 	var allRepos []data.RepoInfo
 
