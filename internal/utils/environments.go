@@ -14,7 +14,7 @@ func (g *APIGetter) GetRepoEnvironments(owner string, repo string) ([]byte, erro
 	url := fmt.Sprintf("repos/%s/%s/environments", owner, repo)
 	resp, err := g.restClient.Request("GET", url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("HTTP error: %v", err)
+		return nil, fmt.Errorf("HTTP error for URL %s: %v", url, err)
 	}
 	defer resp.Body.Close()
 	responseData, err := io.ReadAll(resp.Body)
