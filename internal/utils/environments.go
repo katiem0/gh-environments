@@ -19,7 +19,7 @@ func (g *APIGetter) GetRepoEnvironments(owner string, repo string) ([]byte, erro
 	defer resp.Body.Close()
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("reading response body: %w", err)
+		return nil, fmt.Errorf("reading response body from URL %s: %w", url, err)
 	}
 	return responseData, nil
 }
