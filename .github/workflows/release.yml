@@ -13,4 +13,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cli/gh-extension-precompile@v2
         with:
-          go_version: 1.22
+          go_version: 1.23
