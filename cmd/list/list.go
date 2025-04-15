@@ -176,12 +176,14 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		zap.S().Debugf("Gathering Environments for repo %s", singleRepo.Name)
 		repoEnvs, err := g.GetRepoEnvironments(owner, singleRepo.Name)
 		if err != nil {
-			zap.S().Error("Error raised in writing output", zap.Error(err))
+			zap.S().Errorf("Error accessing repo environments for %s: %v", singleRepo.Name, err)
+			continue
 		}
 		var responseEnvs data.EnvResponse
 		err = json.Unmarshal(repoEnvs, &responseEnvs)
 		if err != nil {
-			return err
+			zap.S().Errorf("Error unmarshaling response for %s: %v", singleRepo.Name, err)
+			continue
 		}
 
 		zap.S().Debugf("Writing data for %d environment(s) to output for repository %s", responseEnvs.TotalCount, singleRepo.Name)
@@ -322,7 +324,6 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 		}
 	}
 	csvWriter.Flush()
-	fmt.Print("Successfully exported environment data to csv ", cmdFlags.reportFile)
-
+	fmt.Printf("Successfully exported environment data to csv file: %s\n", cmdFlags.reportFile)
 	return nil
 }
