@@ -201,10 +201,10 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 
 			for _, rules := range env.ProtectionRules {
 				zap.S().Debugf("Gathering Protection Rules for environment %s", env.Name)
-				if rules.Type == "wait_timer" {
+				switch rules.Type {
+				case "wait_timer":
 					waitTimer = rules.WaitTimer
-
-				} else if rules.Type == "required_reviewers" {
+				case "required_reviewers":
 					zap.S().Debugf("Gathering Required Reviewers for environment %s", env.Name)
 					preventSelfReview = rules.PreventSelfReview
 					for _, reviewer := range rules.Reviewers {
@@ -215,7 +215,7 @@ func runCmdList(owner string, repos []string, cmdFlags *cmdFlags, g *utils.APIGe
 						reviewLists := strings.Join(reviewList, ";")
 						Reviewers = append(Reviewers, reviewLists)
 					}
-				} else if rules.Type == "branch_policy" {
+				case "branch_policy":
 					zap.S().Debugf("Gathering Branch Policies for environment %s", env.Name)
 					if env.DeploymentPolicy.CustomPolicies {
 						BranchPolicyType = "custom"
