@@ -16,7 +16,11 @@ func (g *APIGetter) GetRepoEnvironments(owner string, repo string) ([]byte, erro
 	if err != nil {
 		return nil, fmt.Errorf("HTTP error for URL %s: %v", url, err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("reading response body from URL %s: %w", url, err)
@@ -30,7 +34,11 @@ func (g *APIGetter) GetDeploymentBranchPolicies(owner string, repo string, env s
 	if err != nil {
 		return nil, fmt.Errorf("HTTP error: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("reading response body: %w", err)
@@ -110,12 +118,13 @@ func CreateEnvironmentData(environment data.ImportedEnvironment) *data.CreateEnv
 		}
 		createReviewers = append(createReviewers, cr)
 	}
-	if environment.DeploymentPolicy == "protected" {
+	switch environment.DeploymentPolicy {
+	case "protected":
 		deploymentPolicy = &data.DeploymentPolicy{
 			ProtectedBranches: true,
 			CustomPolicies:    false,
 		}
-	} else if environment.DeploymentPolicy == "custom" {
+	case "custom":
 		deploymentPolicy = &data.DeploymentPolicy{
 			ProtectedBranches: false,
 			CustomPolicies:    true,
@@ -138,7 +147,11 @@ func (g *APIGetter) CreateEnvironment(owner string, repo string, env string, dat
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 	return err
 }
 
@@ -149,7 +162,11 @@ func (g *APIGetter) CreateDeploymentBranches(owner string, repo string, env stri
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 	return err
 }
 
@@ -160,7 +177,11 @@ func (g *APIGetter) GetDeploymentProtectionRules(owner string, repo string, env 
 		log.Printf("Body read error, %v", err)
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Body response data read error, %v", err)

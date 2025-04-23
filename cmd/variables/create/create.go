@@ -106,8 +106,11 @@ func runCmdCreate(owner string, cmdFlags *cmdFlags, g *utils.APIGetter) error {
 		if err != nil {
 			zap.S().Errorf("Error arose opening variables csv file")
 		}
-		// remember to close the file at the end of the program
-		defer f.Close()
+		defer func() {
+			if closeErr := f.Close(); closeErr != nil {
+				zap.S().Warnf("Error closing file: %v", closeErr)
+			}
+		}()
 
 		// read csv values using csv.Reader
 		csvReader := csv.NewReader(f)
