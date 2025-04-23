@@ -16,7 +16,11 @@ func (g *APIGetter) CreateEnvironmentVariables(owner string, repo string, env st
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 	return err
 }
 
@@ -51,7 +55,11 @@ func (g *APIGetter) GetEnvironmentVariables(owner string, repo string, env strin
 		log.Printf("Body read error, %v", err)
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Body read error, %v", err)

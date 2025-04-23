@@ -91,6 +91,7 @@ func NewCmdCreate() *cobra.Command {
 	createCmd.PersistentFlags().BoolVarP(&cmdFlags.debug, "debug", "d", false, "To debug logging")
 	if err := createCmd.MarkFlagRequired("from-file"); err != nil {
 		zap.S().Errorf("Error marking flag 'from-file' as required: %v", err)
+		return nil
 	}
 
 	return &createCmd
