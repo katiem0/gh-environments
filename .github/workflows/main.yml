@@ -1,0 +1,79 @@
+name: PR Checks
+
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@v5.4.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Build
+        run: go build -v .
+
+      - name: Run linting
+        uses: golangci/golangci-lint-action@v7.0.0
+        with:
+          version: latest
+          args: --timeout=5m
+
+      # - name: Run tests
+      #   run: |
+      #     set -o pipefail
+      #     go test -v ./... -race -coverprofile=coverage.txt -covermode=atomic 2>&1 | tee test_output.log
+
+      # - name: Upload coverage report
+      #   uses: codecov/codecov-action@v5.4.2
+      #   with:
+      #     files: ./coverage.txt
+      #     fail_ci_if_error: false
+      #     verbose: true
+
+      # - name: Upload test artifacts
+      #   if: always()
+      #   uses: actions/upload-artifact@v4.6.2
+      #   with:
+      #     name: test-results
+      #     path: |
+      #       coverage.txt
+
+  markdown:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: '16'
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Lint Markdown files
+        run: |
+          markdownlint '**/*.md' \
+            --ignore node_modules \
+            --ignore '**/output/**' \
+            --config .markdownlint.yaml
