@@ -37,8 +37,13 @@ func (g *APIGetter) CreateVariableList(filedata [][]string) []data.ImportedVaria
 	var variableList []data.ImportedVariable
 	var vars data.ImportedVariable
 	for _, each := range filedata[1:] {
-		vars.RepositoryID, _ = strconv.Atoi(each[0])
-		vars.RepositoryName = each[1]
+		// Check if we have enough columns
+		if len(each) < 5 {
+			continue // Skip rows with insufficient data
+		}
+		vars.RepositoryName = each[0]
+		repositoryID, _ := strconv.Atoi(each[1])
+		vars.RepositoryID = repositoryID
 		vars.EnvironmentName = each[2]
 		vars.Name = each[3]
 		vars.Value = each[4]
@@ -50,19 +55,21 @@ func (g *APIGetter) CreateVariableList(filedata [][]string) []data.ImportedVaria
 
 func (g *APIGetter) GetEnvironmentVariables(owner string, repo string, env string) ([]byte, error) {
 	url := fmt.Sprintf("repos/%s/%s/environments/%s/variables", owner, repo, env)
+
 	resp, err := g.restClient.Request("GET", url, nil)
 	if err != nil {
-		log.Printf("Body read error, %v", err)
-		return nil, err
+		return nil, fmt.Errorf("HTTP error: %v", err)
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
 			log.Printf("Error closing response body: %v", closeErr)
 		}
 	}()
+
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Body read error, %v", err)
+		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
-	return responseData, err
+
+	return responseData, nil
 }

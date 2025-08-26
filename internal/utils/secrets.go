@@ -40,8 +40,14 @@ func (g *APIGetter) CreateSecretList(filedata [][]string) []data.ImportedSecret 
 	var secretList []data.ImportedSecret
 	var secret data.ImportedSecret
 	for _, each := range filedata[1:] {
-		secret.RepositoryID, _ = strconv.Atoi(each[0])
-		secret.RepositoryName = each[1]
+		// Skip if not enough columns
+		if len(each) < 5 {
+			continue
+		}
+
+		secret.RepositoryName = each[0]
+		repositoryID, _ := strconv.Atoi(each[1])
+		secret.RepositoryID = repositoryID
 		secret.EnvironmentName = each[2]
 		secret.Name = each[3]
 		secret.Value = each[4]

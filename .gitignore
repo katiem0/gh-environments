@@ -1,3 +1,5 @@
 /gh-environments
 /gh-environments.exe
 report-*.csv
+
+.DS_Store

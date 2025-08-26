@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🔗 How to Use"
+    url: https://github.com/katiem0/gh-environments#readme
+    about: Check out the usage documentation for help.
+  - name: "🔗 GitHub Migration Documentation"
+    url: https://docs.github.com/en/migrations
+    about: Learn about the migration process and best practices.
