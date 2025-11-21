@@ -151,11 +151,11 @@ Both the `create` and `list` commands utilize the following fields:
 
 | Field Name | Description |
 |:-----------|:------------|
-|`RepositoryID`| The `ID` associated with the Repository, for API usage. |
-|`RepositoryName` | The name of the repository where the data is extracted from. |
-|`EnvironmentName`| The name of the repository specific environment. |
-|`SecretName`| The name of the secret|
-|`SecretValue`| Will be blank for `list`, and is required for `create` |
+|`RepositoryID`   | The `ID` associated with the Repository, for API usage.              |
+|`RepositoryName` | The name of the repository where the data is extracted from.         |
+|`EnvironmentName`| The name of the repository specific environment.                     |
+|`SecretName`     | The name of the secret                                               |
+|`SecretValue`    | Will be blank for `list`, and is required for `create`               |
 |`SecretCreatedAt`| The timestamp associated with when the secret was initially created. |
 |`SecretUpdatedAt`| The timestamp associated with the last time the secret was modified. |
 
